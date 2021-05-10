@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "dotenv": "^9.0.1",
+    "nodemon": "^2.0.7"
+  },
+  "name": "kizunaai",
+  "version": "1.0.0",
+  "description": "A fun Discord Bot!",
+  "main": "index.js",
+  "scripts": {
+    "test": "\"ping",
+    "forrest": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kishen35/KizunaAI-Bot.git"
+  },
+  "keywords": [
+    "DiscordBot",
+    "Bot",
+    "KizunaAI"
+  ],
+  "author": "Kishen35",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/Kishen35/KizunaAI-Bot/issues"
+  },
+  "homepage": "https://github.com/Kishen35/KizunaAI-Bot#readme"
+}
