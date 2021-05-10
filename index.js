@@ -18,16 +18,16 @@ dotenv.config();
 
 client.login(process.env.TOKEN);
 
-// Reply to messages
+// Reply to messages || ${prefix} based on value in .env file
 client.on('message', message => {
 	// Pinging
-    if (message.content === '"ping') {
+    if (message.content.startsWith(`${process.env.prefix}ping`)) { // responds as long as startsWith given value
 		// send back "Pong." to the channel the message was sent in
 		message.channel.send('Pong.');
 	}
 
     // Fun
-    if (message.content === 'chumete chumete') {
+    else if (message.content === `${process.env.prefix}chumete chumete`) {
 		message.channel.send('tobikiri igai');
 	}
 });
