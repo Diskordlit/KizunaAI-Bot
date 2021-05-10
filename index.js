@@ -26,8 +26,12 @@ client.on('message', message => {
 		message.channel.send('Pong.');
 	}
 
+    else if (message.content === `${process.env.prefix}beep`) {
+		message.channel.send(`boop ${message.author} from ${message.guild.name} in ${message.guild.region}`); //mentions user, server name and region
+	}
+
     // Fun
-    else if (message.content === `${process.env.prefix}chumete chumete`) {
+    else if (message.content === "chumete chumete") {
 		message.channel.send('tobikiri igai');
 	}
 });
