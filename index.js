@@ -18,10 +18,16 @@ dotenv.config();
 
 client.login(process.env.TOKEN);
 
-// Pinging
+// Reply to messages
 client.on('message', message => {
-	if (message.content === '"ping') {
+	// Pinging
+    if (message.content === '"ping') {
 		// send back "Pong." to the channel the message was sent in
 		message.channel.send('Pong.');
+	}
+
+    // Fun
+    if (message.content === 'chumete chumete') {
+		message.channel.send('tobikiri igai');
 	}
 });
