@@ -41,8 +41,6 @@ client.on('message', message => {
         const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' '); // args creates an array of the parameters passed after command
         const command = args.shift().toLowerCase(); // removes the command (first element in args) from the array
 
-        const bodyParser = require('body-parser');
-
         const packageTracker = require('./package-tracker/post');
 
 		if (!args.length){
@@ -64,5 +62,24 @@ client.on('message', message => {
                 failureCallback();
             });
         }
+	}
+
+    // Virus Total
+    if (message.content.startsWith(`${process.env.prefix}url`)) {
+		const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' '); // args creates an array of the parameters passed after command
+        const command = args.shift().toLowerCase(); // removes the command (first element in args) from the array
+        
+        const virusTotal =  require('./virustotal/post');
+        console.log(args[0]);
+        virusTotal.urlRequest(args[0]);
+
+        const wait=ms=>new Promise(resolve => setTimeout(resolve, ms));
+        wait(4*1000).then(() => {
+            if (virusTotal.danger == true){
+                message.channel.send(`Uh-Oh! I wouldn't go there if I were you \n ${virusTotal.flags}/${virusTotal.totalEngines} engines detected this page as possibly malicious. \nVirusTotal engine findings: \n harmless: ${virusTotal.harmless} \n malicious: ${virusTotal.malicious} \n suspicious: ${virusTotal.suspicious} \n undetected: ${virusTotal.undetected}`);
+            } else if (virusTotal.danger == false){
+                message.channel.send(`Looks pretty safe to me! \n ${virusTotal.flags}/${virusTotal.totalEngines} engines detected this page as possibly malicious. \nVirusTotal engine findings: \n harmless: ${virusTotal.harmless} \n malicious: ${virusTotal.malicious} \n suspicious: ${virusTotal.suspicious} \n undetected: ${virusTotal.undetected}`);
+            }
+        });
 	}
 });
