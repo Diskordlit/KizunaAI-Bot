@@ -5,7 +5,8 @@ A fun Discord Bot!
 
 ### What can I do?
 
-
+` "ping `
+` "url {url} `
 
 Made with **Node.js**
 
