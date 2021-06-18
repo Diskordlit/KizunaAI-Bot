@@ -17,7 +17,7 @@ dotenv.config();
 client.login(process.env.TOKEN);
 
 // Reply to messages || ${prefix} based on value in .env file
-client.on('message', message => {
+client.on('message', async(message) => {
 	if (!message.content.startsWith(`${process.env.prefix}`) || message.author.bot) return; // if message does not start with prefix or if author is bot, skip.
 
 	// Ping
@@ -66,20 +66,24 @@ client.on('message', message => {
 
     // Virus Total
     if (message.content.startsWith(`${process.env.prefix}url`)) {
-		const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' '); // args creates an array of the parameters passed after command
+        const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' '); // args creates an array of the parameters passed after command
         const command = args.shift().toLowerCase(); // removes the command (first element in args) from the array
         
         const virusTotal =  require('./virustotal/post');
         console.log(args[0]);
         virusTotal.urlRequest(args[0]);
 
-        const wait=ms=>new Promise(resolve => setTimeout(resolve, ms));
-        wait(4*1000).then(() => {
-            if (virusTotal.danger == true){
+        function virusTotalResponse() {
+            if (virusTotal.urlValidator == false){ // incorrect url
+                message.channel.send("You did not give me a proper url!");
+            } else if (virusTotal.status != 'completed'){ // check if VirusTotal processing completed due to free API limitation
+                message.channel.send("Aw shucks, I can't get it for you this time due to VIrusTotal free API limitations, try again later");
+            } else if (virusTotal.danger == true){ // if site is dangerous
                 message.channel.send(`Uh-Oh! I wouldn't go there if I were you \n ${virusTotal.flags}/${virusTotal.totalEngines} engines detected this page as possibly malicious. \nVirusTotal engine findings: \n harmless: ${virusTotal.harmless} \n malicious: ${virusTotal.malicious} \n suspicious: ${virusTotal.suspicious} \n undetected: ${virusTotal.undetected}`);
-            } else if (virusTotal.danger == false){
-                message.channel.send(`Looks pretty safe to me! \n ${virusTotal.flags}/${virusTotal.totalEngines} engines detected this page as possibly malicious. \nVirusTotal engine findings: \n harmless: ${virusTotal.harmless} \n malicious: ${virusTotal.malicious} \n suspicious: ${virusTotal.suspicious} \n undetected: ${virusTotal.undetected}`);
+            } else if (virusTotal.danger == false){ // if site is alright
+                message.channel.send(`Looks alright to me! \n ${virusTotal.flags}/${virusTotal.totalEngines} engines detected this page as possibly malicious. \nVirusTotal engine findings: \n harmless: ${virusTotal.harmless} \n malicious: ${virusTotal.malicious} \n suspicious: ${virusTotal.suspicious} \n undetected: ${virusTotal.undetected}`);
             }
-        });
-	}
+        }
+        setTimeout(virusTotalResponse, 24000);
+    }
 });
