@@ -12,8 +12,15 @@ Made with **Node.js**
 
 ### Dependencies
 
-to install:
-` npm install {module} `
+The required dependencies are included inside package.json  
+to install, simply run:  
+`npm install`
+
+or, if you prefer selective or custom package version  
+installation (worth noting that wrong package may cause the application to fail):  
+`npm install {module}`  
+
+Below are the required modules:
 
 - discord.js
 - dotenv
