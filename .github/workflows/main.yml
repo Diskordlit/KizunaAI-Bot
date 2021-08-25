@@ -8,7 +8,7 @@ jobs:
 
   build:
 
-    runs-on: self-hosted
+    runs-on: ardraspi4b-ubuntu
 
     steps:
     - uses: actions/checkout@v2
