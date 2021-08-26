@@ -127,7 +127,7 @@ async function queryToVirusTotal(message, args) {
             }
             queryToVirusTotal(retryMessage, retryArgs)
             sentMessage.delete()
-        }, 1000)
+        }, 2000)
     }
 
 }

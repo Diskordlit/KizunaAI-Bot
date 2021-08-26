@@ -14,7 +14,7 @@ async function urlRequest(url) {
             'x-apikey': `${process.env.VirusTotalApiKey}`
         },
         body: form
-    }).then(result => result.json()).then(json => json).catch(error => {
+    }).then(result => result.json()).catch(error => {
         return {
             resolved: false,
             code: error.code,
@@ -42,7 +42,7 @@ async function urlRequest(url) {
         headers: {
             'x-apikey': `${process.env.VirusTotalApiKey}`
         }
-    }).then(result => result.json()).then(json => json)
+    }).then(result => result.json())
 
     return new Promise((resolve, reject) => {
         if (query.data.attributes.status === 'completed') {
