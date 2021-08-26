@@ -19,7 +19,7 @@ exports.urlRequest = (url) => {
 
         try{
             exports.urlValidator = true; // determine if user sent a proper url
-            console.log(json.data.id);
+            // console.log(json.data.id);
             var id = json.data.id;
         } catch {
             exports.urlValidator = false; // if error is triggered, user did not send a proper url

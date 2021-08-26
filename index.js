@@ -24,6 +24,11 @@ client.on('message', async (message) => {
         message.channel.send('tobikiri igai')
     }
 
+    // I know right?
+    if (message.content.includes('wtf')) {
+        message.channel.send('I know right?')
+    }
+
     // if message does not start with prefix or if author is bot, skip.
     if (!message.content.startsWith(`${process.env.prefix}`) || message.author.bot) return
 
@@ -88,4 +93,59 @@ client.on('message', async (message) => {
         }
         setTimeout(virusTotalResponse, 24000);
     }
+
+    if (message.content.startsWith(`${process.env.prefix}cum`)) {
+        const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' ')
+        args.shift().toLowerCase()
+        attemptCount = 0
+        queryToVirusTotal(message, args[0])
+    }
 });
+
+var attemptCount = 0
+
+async function queryToVirusTotal(message, args) {
+    const urlRequest = require('./virustotal/virustotal.js')
+    const result = await urlRequest(args)
+    if (result.resolved && isItSafe(result.stats)) {
+        message.channel.send(`Looks alright to me!\n\n${resultToString(result.stats)}`)
+    } else if (result.resolved && !isItSafe(result.stats)) {
+        message.channel.send(`I wouldn't go there if I were you...\n\n${resultToString(result.stats)}`)
+    } else {
+        if (result.code === 'VIRUSTOTALREJECT001') {
+            return message.channel.send(`Aw shucks, I can't get it for you this time. ${result.message}. ${result.solution}`)
+        }
+        attemptCount++
+        var retryArgs = args
+        var retryMessage = message
+        // var sentMessage = await message.channel.send(`Aw shucks, I can't get it for you on time. ${result.message}. ${result.solution}`)
+        var sentMessage = await message.channel.send(`Aw shucks, I can't get it for you on time. Lemme retry real quick! Attempt number ${attemptCount}, let's go!`)
+        setTimeout(() => {
+            if (attemptCount >= 3) {
+                message.channel.send(`Aw shucks, I can't get it for you this time. ${result.message}. ${result.solution}`)
+                return sentMessage.delete()
+            }
+            queryToVirusTotal(retryMessage, retryArgs)
+            sentMessage.delete()
+        }, 1000)
+    }
+
+}
+
+function isItSafe(json) {
+    if (json.malicious > 5 || json.suspicious > 8) return false
+    return true
+}
+
+function resultToString(json) {
+    const flaggedEngineCount = json.malicious + json.suspicious
+    const totalEngines = json.harmless + json.malicious + json.suspicious
+    return 'These are the readings from VirusTotal engines:\n' +
+        `${flaggedEngineCount}/${totalEngines} engines detected this site as possibly malicious\n` +
+        `Harmless: ${json.harmless}\n` +
+        `Malicious: ${json.malicious}\n` +
+        `Suspicious: ${json.suspicious}\n` +
+        `Undetected: ${json.undetected}\n` +
+        `Timeout: ${json.timeout}\n` +
+        `Number of supported engines (excluding undetected and timeout): ${totalEngines}\n`
+}
