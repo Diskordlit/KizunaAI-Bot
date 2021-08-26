@@ -8,7 +8,7 @@ exports.fetcher = (url, action) => {
         method: action,
         headers: {
             'Content-Type': 'application/json',
-            'Tracktry-Api-Key': `${process.env.TracktryApiKey}`
+            'Tracktry-Api-Key': `${process.env.TRACKTRY_API_KEY}`
         }
     })
     .then(res => res.json())

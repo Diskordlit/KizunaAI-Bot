@@ -11,7 +11,7 @@ async function urlRequest(url) {
     const result = await fetch('https://www.virustotal.com/api/v3/urls', {
         method: "POST",
         headers: {
-            'x-apikey': `${process.env.VirusTotalApiKey}`
+            'x-apikey': `${process.env.VIRUSTOTAL_API_KEY}`
         },
         body: form
     }).then(result => result.json()).catch(error => {
@@ -40,7 +40,7 @@ async function urlRequest(url) {
     const query = await fetch(`https://www.virustotal.com/api/v3/analyses/${result.data.id}`, {
         method: "GET",
         headers: {
-            'x-apikey': `${process.env.VirusTotalApiKey}`
+            'x-apikey': `${process.env.VIRUSTOTAL_API_KEY}`
         }
     }).then(result => result.json())
 

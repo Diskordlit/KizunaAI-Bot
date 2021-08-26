@@ -11,7 +11,7 @@ exports.urlRequest = (url) => {
 
     fetch('https://www.virustotal.com/api/v3/urls', {
         method: "POST",
-        headers: { 'x-apikey': `${process.env.VirusTotalApiKey}` },
+        headers: { 'x-apikey': `${process.env.VIRUSTOTAL_API_KEY}` },
         body: form
     })
     .then(res => res.json())
@@ -28,7 +28,7 @@ exports.urlRequest = (url) => {
         function virusTotalResult(){
             fetch(`https://www.virustotal.com/api/v3/analyses/${id}`, {
                 method: "GET",
-                headers: { 'x-apikey': `${process.env.VirusTotalApiKey}` }
+                headers: { 'x-apikey': `${process.env.VIRUSTOTAL_API_KEY}` }
             })
             .then(res => res.json())
             .then(json => {

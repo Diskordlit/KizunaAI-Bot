@@ -1,7 +1,14 @@
 // DISCORD.JS
 const Discord = require('discord.js');
+const {
+    queryToVirusTotal,
+    attemptCount
+} = require('./virustotal/helper.js')
+const {
+    queryTTryTrackThis,
+    queryTTryThisStatus
+} = require('./package-tracker/helper')
 
-// Hello World!
 
 // create a new Discord client
 const client = new Discord.Client();
@@ -18,7 +25,7 @@ dotenv.config();
 
 client.login(process.env.TOKEN);
 
-// Reply to messages || ${prefix} based on value in .env file
+// Reply to messages || ${PREFIX} based on value in .env file
 client.on('message', async (message) => {
 
     // Fun
@@ -31,23 +38,23 @@ client.on('message', async (message) => {
         message.channel.send('I know right?')
     }
 
-    // if message does not start with prefix or if author is bot, skip.
-    if (!message.content.startsWith(`${process.env.prefix}`) || message.author.bot) return
+    // if message does not start with PREFIX or if author is bot, skip.
+    if (!message.content.startsWith(`${process.env.PREFIX}`) || message.author.bot) return
 
     // Ping
-    if (message.content.startsWith(`${process.env.prefix}ping`)) { // responds as long as startsWith given value
+    if (message.content.startsWith(`${process.env.PREFIX}ping`)) { // responds as long as startsWith given value
         // send back "Pong." to the channel the message was sent in
         message.channel.send('Pong.');
     }
 
     // Beep
-    if (message.content === `${process.env.prefix}beep`) {
+    if (message.content === `${process.env.PREFIX}beep`) {
         message.channel.send(`boop ${message.author} from ${message.guild.name} in ${message.guild.region}`); //mentions user, server name and region
     }
 
     // Package Tracker
-    if (message.content.startsWith(`${process.env.prefix}track`)) {
-        const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' '); // args creates an array of the parameters passed after command
+    if (message.content.startsWith(`${process.env.PREFIX}track`)) {
+        const args = message.content.slice(`${process.env.PREFIX}`.length).trim().split(' '); // args creates an array of the parameters passed after command
         const command = args.shift().toLowerCase(); // removes the command (first element in args) from the array
 
         const packageTracker = require('./package-tracker/post');
@@ -74,8 +81,8 @@ client.on('message', async (message) => {
     }
 
     // Virus Total
-    if (message.content.startsWith(`${process.env.prefix}url`)) {
-        const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' '); // args creates an array of the parameters passed after command
+    if (message.content.startsWith(`${process.env.PREFIX}url`)) {
+        const args = message.content.slice(`${process.env.PREFIX}`.length).trim().split(' '); // args creates an array of the parameters passed after command
         const command = args.shift().toLowerCase(); // removes the command (first element in args) from the array
 
         const virusTotal = require('./virustotal/post');
@@ -96,58 +103,22 @@ client.on('message', async (message) => {
         setTimeout(virusTotalResponse, 24000);
     }
 
-    if (message.content.startsWith(`${process.env.prefix}cum`)) {
-        const args = message.content.slice(`${process.env.prefix}`.length).trim().split(' ')
+    if (message.content.startsWith(`${process.env.PREFIX}cum`)) {
+        const args = message.content.slice(`${process.env.PREFIX}`.length).trim().split(' ')
         args.shift().toLowerCase()
-        attemptCount = 0
+        attemptCount++
         queryToVirusTotal(message, args[0])
     }
-});
 
-var attemptCount = 0
-
-async function queryToVirusTotal(message, args) {
-    const urlRequest = require('./virustotal/virustotal.js')
-    const result = await urlRequest(args)
-    if (result.resolved && isItSafe(result.stats)) {
-        message.channel.send(`Looks alright to me!\n\n${resultToString(result.stats)}`)
-    } else if (result.resolved && !isItSafe(result.stats)) {
-        message.channel.send(`I wouldn't go there if I were you...\n\n${resultToString(result.stats)}`)
-    } else {
-        if (result.code === 'VIRUSTOTALREJECT001') {
-            return message.channel.send(`Aw shucks, I can't get it for you this time. ${result.message}. ${result.solution}`)
-        }
-        attemptCount++
-        var retryArgs = args
-        var retryMessage = message
-        // var sentMessage = await message.channel.send(`Aw shucks, I can't get it for you on time. ${result.message}. ${result.solution}`)
-        var sentMessage = await message.channel.send(`Aw shucks, I can't get it for you on time. Lemme retry real quick! Attempt number ${attemptCount}, let's go!`)
-        setTimeout(() => {
-            if (attemptCount >= 3) {
-                message.channel.send(`Aw shucks, I can't get it for you this time. ${result.message}. ${result.solution}`)
-                return sentMessage.delete()
-            }
-            queryToVirusTotal(retryMessage, retryArgs)
-            sentMessage.delete()
-        }, 2000)
+    if (message.content.startsWith(`${process.env.PREFIX}followthis`)) {
+        const args = message.content.slice(`${process.env.PREFIX}`.length).trim().split(' ')
+        args.shift().toLowerCase()
+        queryTTryTrackThis(message, args)
     }
 
-}
-
-function isItSafe(json) {
-    if (json.malicious > 5 || json.suspicious > 8) return false
-    return true
-}
-
-function resultToString(json) {
-    const flaggedEngineCount = json.malicious + json.suspicious
-    const totalEngines = json.harmless + json.malicious + json.suspicious
-    return 'These are the readings from VirusTotal engines:\n' +
-        `${flaggedEngineCount}/${totalEngines} engines detected this site as possibly malicious\n` +
-        `Harmless: ${json.harmless}\n` +
-        `Malicious: ${json.malicious}\n` +
-        `Suspicious: ${json.suspicious}\n` +
-        `Undetected: ${json.undetected}\n` +
-        `Timeout: ${json.timeout}\n` +
-        `Number of supported engines (excluding undetected and timeout): ${totalEngines}\n`
-}
+    if (message.content.startsWith(`${process.env.PREFIX}whatbouthis`)) {
+        const args = message.content.slice(`${process.env.PREFIX}`.length).trim().split(' ')
+        args.shift().toLowerCase()
+        queryTTryThisStatus(message, args)
+    }
+});
