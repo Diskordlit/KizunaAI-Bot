@@ -1,6 +1,8 @@
 // DISCORD.JS
 const Discord = require('discord.js');
 
+// Hello World!
+
 // create a new Discord client
 const client = new Discord.Client();
 
