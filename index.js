@@ -6,8 +6,13 @@ const {
 } = require('./virustotal/helper.js')
 const {
     queryTTryTrackThis,
-    queryTTryThisStatus
+    queryTTryThisStatus,
+    queryTTryUpdateThis
 } = require('./package-tracker/helper')
+const {
+    filterNullString,
+    filterWhiteSpace
+} = require('./helper/helper')
 
 
 // create a new Discord client
@@ -120,5 +125,14 @@ client.on('message', async (message) => {
         const args = message.content.slice(`${process.env.PREFIX}`.length).trim().split(' ')
         args.shift().toLowerCase()
         queryTTryThisStatus(message, args)
+    }
+
+    if (message.content.startsWith(`${process.env.PREFIX}updatethis`)) {
+        const args = message.content.slice(`${process.env.PREFIX}`.length).split(/('.*?'|[^'\s]+)+(?=\s*|\s*$)/g)
+        var newArgs
+        newArgs = args.filter(filterNullString)
+        newArgs = newArgs.filter(filterWhiteSpace)
+        newArgs.shift()
+        queryTTryUpdateThis(message, newArgs)
     }
 });

@@ -163,6 +163,67 @@ exports.getStatusOfThisParcel = async (metadata) => {
         return rejection
     })
 }
-exports.updateThisParcel = async () => {}
+exports.updateThisParcel = async (metadata) => {
+    var body = {
+        title: metadata.deliveryTitle || undefined,
+        customer_name: metadata.customerName || undefined,
+        customer_email: metadata.customerEmail || undefined,
+        order_id: metadata.orderID || undefined,
+        logistics_channel: metadata.logisticsChannel || undefined
+    }
+
+    body = JSON.stringify(body)
+
+    const result = await fetch(`${process.env.TRACKTRY_BASE_URL}/trackings/${metadata.courierCode}/${metadata.trackingNumber}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Tracktry-Api-Key': `${process.env.TRACKTRY_API_KEY}`
+        },
+        body: body
+    }).then(result => result.json()).catch(error => {
+        return {
+            resolved: false,
+            code: error.code,
+            codetext: error.errno,
+            message: 'Query made to TrackTry API failed',
+            solution: 'It could be due to network failure. Try again later.'
+        }
+    })
+
+    return new Promise((resolve, reject) => {
+        if (result['meta']['code'] === 200) {
+            return resolve({
+                resolved: true,
+                code: 'TRACKTRYRESOLVE003',
+                codetext: 'RESOLVED_WITH_CODE_200',
+                message: 'Code check returned a 200 HTTP code',
+                data: {
+                    id: result.data.id,
+                    tracking_number: result.data.tracking_number,
+                    courier_code: result.data.carrier_code,
+                    created_at: result.data.created_at,
+                    updated_at: result.data.updated_at,
+                    customer_email: result.data.customer_email,
+                    title: result.data.title,
+                    order_id: result.data.order_id,
+                    customer_name: result.data.customer_name,
+                    archived: result.data.archived,
+                    destination_code: result.data.destination_code,
+                    logistics_channel: result.data.logistics_channel
+                }
+            })
+        }
+        return reject({
+            resolved: false,
+            code: 'TRACKTRYREJECT999',
+            codetext: 'REJECTED_DUE_TO_CODE_BEING_UNKNOWN',
+            message: 'Code check returned anything besides from those which are handled',
+            solution: 'Nothing I can do, kiddo.'
+        })
+    }).catch(rejection => {
+        return rejection
+    })
+}
 exports.deleteThisParcel = async () => {}
 exports.deleteTheseParcels = async () => {}
