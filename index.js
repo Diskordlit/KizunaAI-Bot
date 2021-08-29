@@ -10,8 +10,7 @@ const {
     queryTTryUpdateThis
 } = require('./package-tracker/helper')
 const {
-    filterNullString,
-    filterWhiteSpace
+    argumentsFilterer
 } = require('./helper/helper')
 
 
@@ -129,10 +128,28 @@ client.on('message', async (message) => {
 
     if (message.content.startsWith(`${process.env.PREFIX}updatethis`)) {
         const args = message.content.slice(`${process.env.PREFIX}`.length).split(/('.*?'|[^'\s]+)+(?=\s*|\s*$)/g)
-        var newArgs
-        newArgs = args.filter(filterNullString)
-        newArgs = newArgs.filter(filterWhiteSpace)
-        newArgs.shift()
+        const newArgs = argumentsFilterer(args)
         queryTTryUpdateThis(message, newArgs)
+    }
+
+    if (message.content.startsWith(`${process.env.PREFIX}comeinside`)) {
+        try {
+            var voice = message.member.voice.channel
+            voice.join().then(connection => {
+                console.log('joined channel')
+                const stream = 'https://www.bensound.com/bensound-music/bensound-ukulele.mp3'
+                const dispatcher = connection.play(stream)
+            }).catch(error => console.error(error))
+        } catch (error) {
+            message.channel.send(`${message.author}, you are not in any voice channel!`)
+        }
+    }
+
+    if (message.content.startsWith(`${process.env.PREFIX}leave`)) {
+        try {
+            message.guild.me.voice.channel.leave()
+        } catch (error) {
+            message.channel.send(`${message.author}, I am not in any voice channel!`)
+        }
     }
 });
