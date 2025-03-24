@@ -5,10 +5,21 @@ A fun Discord Bot!
 
 ### What can I do?
 
-` "ping `
-` "url {url} `
+` ^ping `
+` ^url {url} `
 
 Made with **Node.js**
+
+### Docker Setup
+Build Image from DockerFile
+```
+docker build -t kizuna_ai .
+```
+
+Run Container from Image
+```
+docker run -p 3000:3000 kizuna_ai --name kizuna
+```
 
 ### Dependencies
 
