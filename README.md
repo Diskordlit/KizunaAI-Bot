@@ -7,6 +7,8 @@ A fun Discord Bot!
 
 ` ^ping `
 ` ^url {url} `
+` ^chat {message} `
+` ^chat/{model} {message} `
 
 Made with **Node.js**
 
@@ -18,7 +20,20 @@ docker build -t kizuna_ai .
 
 Run Container from Image
 ```
-docker run -p 3000:3000 kizuna_ai --name kizuna
+docker run -p 8888:8888 kizuna_ai --name kizuna
+```
+
+### Additional Configuration
+Define open-webui models that can be used in `llama > post.js`
+
+```javascript
+// Define available models
+exports.models = {
+    'llama': 'llama-3.2-3b-instruct-q8_0:latest',
+    'deepseek': 'DeepSeek-R1-Distill-Qwen-7B-Q4_K_M:latest',
+    'gemma': 'gemma3:27b'
+    // Add more models as needed
+};
 ```
 
 ### Dependencies

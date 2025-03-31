@@ -93,4 +93,44 @@ client.on('message', async (message) => {
             setTimeout(virusTotalResponse, 24000);
         }
     }
+
+    // Chat with AI
+    if (message.content.startsWith(`${process.env.prefix}chat`)) {
+        const llama = require('./llama/post');
+        const input = message.content.slice(`${process.env.prefix}chat`.length).trim();
+        
+        // Check if model is specified
+        let modelName = 'llama';
+        let query = input;
+        
+        if (input.startsWith('/')) {
+            const parts = input.substring(1).split(' ');
+            modelName = parts[0];
+            query = parts.slice(1).join(' ');
+        }
+
+        if (!query) {
+            const availableModels = Object.keys(llama.models).join(', ');
+            message.channel.send(`Please provide a message! \nHint: ^chat/model your message\nAvailable models: ${availableModels}`);
+            return;
+        }
+
+        message.channel.send("Thinking... 🤔");
+        await llama.chatWithModel(query, modelName);
+        
+        if (llama.status === 'success') {
+            // Handle Deepseek's thinking process
+            if (modelName.toLowerCase() === 'deepseek' && llama.reply.includes('</think>')) {
+                const [thinking, response] = llama.reply.split('</think>');
+                // Send thinking process in a code block
+                message.channel.send('```\nThinking Process:\n' + thinking.trim() + '\n```');
+                // Send the actual response
+                message.channel.send(response.trim());
+            } else {
+                message.channel.send(llama.reply);
+            }
+        } else {
+            message.channel.send("Sorry, I couldn't process that request.");
+        }
+    }
 });
